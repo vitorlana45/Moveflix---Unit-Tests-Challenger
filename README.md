@@ -68,5 +68,3 @@ bash
 
     mvn install
     mvn spring-boot:run
-
-Contribuição 👥
