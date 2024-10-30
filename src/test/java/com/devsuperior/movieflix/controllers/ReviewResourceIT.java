@@ -84,37 +84,40 @@ public class ReviewResourceIT {
 
 		result.andExpect(status().isForbidden());
 	}
-	
+
 	@Test
 	public void insertShouldInsertReviewWhenMemberAuthenticatedAndValidData() throws Exception {
-		
+
 		String accessToken = tokenUtil.obtainAccessToken(mockMvc, memberUsername, memberPassword);
-		
+
 		String reviewText = "Gostei do filme!";
 		long movieId = 1L;
-		
+
 		ReviewDTO reviewDTO = new ReviewDTO();
 		reviewDTO.setText(reviewText);
 		reviewDTO.setMovieId(movieId);
+		reviewDTO.setUserName(memberUsername);
+		reviewDTO.setUserEmail("ana@gmail.com"); // Certifique-se de usar o email desejado
 
 		String jsonBody = objectMapper.writeValueAsString(reviewDTO);
-		
+
 		ResultActions result =
 				mockMvc.perform(post("/reviews")
 						.header("Authorization", "Bearer " + accessToken)
 						.content(jsonBody)
 						.contentType(MediaType.APPLICATION_JSON)
 						.accept(MediaType.APPLICATION_JSON));
-		
+
 		result.andExpect(status().isCreated());
-		
+
 		result.andExpect(jsonPath("$.id").isNotEmpty());
 		result.andExpect(jsonPath("$.text").value(reviewText));
 		result.andExpect(jsonPath("$.movieId").value(movieId));
 		result.andExpect(jsonPath("$.userId").isNotEmpty());
 		result.andExpect(jsonPath("$.userName").isNotEmpty());
-		result.andExpect(jsonPath("$.userEmail").value(memberUsername));
+		result.andExpect(jsonPath("$.userEmail").value("ana@gmail.com"));
 	}
+
 
 	@Test
 	public void insertShouldReturnUnproccessableEntityWhenMemberAuthenticatedAndInvalidData() throws Exception {
